@@ -10,7 +10,7 @@ if( params.gtf ){
 if ( params.fasta ){
     Channel.fromPath(params.fasta)
            .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-           .into { fasta }
+           .set { fasta }
 }
 else {
     exit 1, "No reference genome specified!"

@@ -1,1 +1,1 @@
-# leafcutter_intron_clustering
+# leafcutter intron clustering

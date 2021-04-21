@@ -1,0 +1,11 @@
+../nextflow run ./main.nf\
+ -profile none\
+ --readPathsFile ./data/test_data2.tsv\
+ --singleEnd\
+ --skipAlignment\
+ --reverse_stranded\
+ --gtf /mnt/c/Users/KarlV/Documents/Wörk/splice_prediction/data/gencode.v30.basic.annotation.gtf\
+ --hisat2_index /mnt/c/Users/KarlV/Documents/Wörk/grch38/genome\
+ --vcfPath /mnt/c/Users/KarlV/Documents/Wörk/test_data/\
+ --bamPath /mnt/c/Users/KarlV/Documents/Wörk/test_data/run_2/geuvadis\
+ -resume

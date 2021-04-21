@@ -9,7 +9,7 @@ process bam_to_junc {
     path "${bam.baseName}.junc", emit: junc
     script:
     """
-    regtools junctions extract -s 1 -a 8 -m 50 -M 500000 $bam -o ${bam.baseName}.junc
+    regtools junctions extract -s 0 -a 8 -m 50 -M 500000 $bam -o ${bam.baseName}.junc
     """
 }
 
@@ -24,7 +24,7 @@ process intron_clustering_pr {
     path "leafcutter_perind*.gz", emit: perind_counts
     script:
     """
-    leafcutter_cluster.py -j $junc_files -m 50 -o leafcutter -l 500000 --checkchrom TRUE
+    leafcutter_cluster_regtools.py -j $junc_files -m 50 -o leafcutter -l 500000 --checkchrom TRUE
     """
 }
 

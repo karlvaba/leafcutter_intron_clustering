@@ -9,7 +9,7 @@ process bam_to_junc {
     path "${bam.baseName}.junc", emit: junc
     script:
     """
-    regtools junctions extract -s 0 -a 8 -m 50 -M 500000 $bam -o ${bam.baseName}.junc
+    regtools junctions extract -s 1 -a 8 -m 50 -M 500000 $bam -o ${bam.baseName}.junc
     """
 }
 

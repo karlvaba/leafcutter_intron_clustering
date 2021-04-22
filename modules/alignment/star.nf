@@ -93,20 +93,39 @@ process star {
     def star_mem = task.memory ?: params.star_memory ?: false
     def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
     seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
-    """
-    STAR --genomeDir $index \\
-        --sjdbGTFfile $gtf \\
-        --readFilesIn $reads  \\
-        --runThreadN ${task.cpus} \\
-        --twopassMode Basic \\
-        --outWigType bedGraph \\
-        --outSAMtype BAM SortedByCoordinate $avail_mem \\
-        --readFilesCommand zcat \\
-        --runDirPerm All_RWX \\
-            --outFileNamePrefix $prefix $seqCenter
-        
-    samtools index ${prefix}Aligned.sortedByCoord.out.bam
-    """
+    if (params.wasp) {
+        """
+        STAR --genomeDir $star_index \\
+            --sjdbGTFfile $gtf \\
+            --readFilesIn $reads  \\
+            --runThreadN ${task.cpus} \\
+            --twopassMode Basic \\
+            --outWigType bedGraph \\
+            --outSAMtype BAM SortedByCoordinate $avail_mem \\
+            --readFilesCommand zcat \\
+            --runDirPerm All_RWX \\
+                --outFileNamePrefix $prefix $seqCenter
+            
+        samtools index ${prefix}Aligned.sortedByCoord.out.bam
+        """
+    } else {
+        """
+        STAR --genomeDir $star_index \\
+            --sjdbGTFfile $gtf \\
+            --readFilesIn $reads  \\
+            --runThreadN ${task.cpus} \\
+            --twopassMode Basic \\
+            --waspOutputMode SAMtag\\
+            --outWigType bedGraph \\
+            --outSAMtype BAM SortedByCoordinate $avail_mem \\
+            --readFilesCommand zcat \\
+            --runDirPerm All_RWX \\
+                --outFileNamePrefix $prefix $seqCenter
+            
+        samtools index ${prefix}Aligned.sortedByCoord.out.bam
+        """
+    }
+    
     }
 
 

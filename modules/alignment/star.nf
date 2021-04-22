@@ -16,6 +16,17 @@ else {
     exit 1, "No reference genome specified!"
 }
 
+if ( params.star_index ){
+    star_index = Channel
+        .fromPath("${params.star_index}")
+        .ifEmpty { exit 1, "Star index not found: ${params.star_index}" }
+}
+
+else {
+    exit 1, "No star index specified!"
+}
+
+
 
 process makeSTARindex {
     container = 'quay.io/eqtlcatalogue/rnaseq:v20.11.1'
@@ -133,8 +144,7 @@ workflow star_align {
     take:
         trimmed_reads
     main:
-        makeSTARindex(fasta, gtf)
-        star(trimmed_reads, makeSTARindex.out.star_index.collect(), gtf.collect())
+        star(trimmed_reads, star_index, gtf.collect())
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
         bam_index = star.out.bam_index

@@ -115,7 +115,7 @@ process star {
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
-            --waspOutputMode SAMtag\\
+            --waspOutputMode SAMtag \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\

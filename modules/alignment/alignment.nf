@@ -1,7 +1,7 @@
 if (params.aligner == 'star') {
-    include { star_align } from 'star'
+    include { star_align } from './star'
 } else { //otherwise align with hisat2
-    include { hisat2_align } from 'hisat2'
+    include { hisat2_align } from './hisat2'
 }
 
 workflow alignment {

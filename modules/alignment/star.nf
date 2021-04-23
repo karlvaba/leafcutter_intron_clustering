@@ -111,6 +111,7 @@ process star {
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
+            --waspOutputMode SAMtag \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\
@@ -126,7 +127,6 @@ process star {
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
-            --waspOutputMode SAMtag \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\
@@ -139,6 +139,28 @@ process star {
     
     }
 
+process filterBams {
+    container = 'quay.io/eqtlcatalogue/rnaseq:v20.11.1'
+
+    input:
+    file bam
+
+    output:
+    path "{bam}", emit: bam_filtered
+
+    script:
+    def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+    """
+    mkdir star
+    STAR \\
+        --runMode genomeGenerate \\
+        --runThreadN ${task.cpus} \\
+        --sjdbGTFfile $gtf \\
+        --genomeDir star/ \\
+        --genomeFastaFiles $fasta \\
+        $avail_mem
+    """
+}
 
 workflow star_align {
     take:

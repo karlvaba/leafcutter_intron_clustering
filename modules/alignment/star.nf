@@ -112,6 +112,7 @@ process star {
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
+            --varVCFfile <(zcat ${params.vcf}) \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\

@@ -90,6 +90,7 @@ process star {
     tuple val(samplename), file(reads)
     file star_index
     file gtf
+    file vcf
 
     output:
  
@@ -112,7 +113,7 @@ process star {
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
-            --varVCFfile <(zcat ${params.vcf}) \\
+            --varVCFfile <(zcat ${vcf}) \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\
@@ -140,11 +141,14 @@ process star {
     
     }
 
+include { modify_vcf } from '../utils/vcf_mod'
+
 workflow star_align {
     take:
         trimmed_reads
     main:
-        star(trimmed_reads, star_index, gtf.collect())
+        modify_vcf()
+        star(trimmed_reads, star_index, gtf.collect(), modify_vcf.out.vcf_modified)
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
         bam_index = star.out.bam_index

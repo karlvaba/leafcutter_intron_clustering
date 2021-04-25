@@ -1,6 +1,6 @@
-if( params.vcfPath ){
+if( params.vcf ){
     Channel
-        .fromPath("${params.vcfPath}*vcf.gz")
+        .fromPath("${params.vcf}*vcf.gz")
         .ifEmpty { exit 1, "VCF file(s) not found: ${params.vcf}" }
         .set { vcf }
 } else {
@@ -26,5 +26,8 @@ process modify_vcf_pr {
 }
 
 workflow modify_vcf {
-    modify_vcf_pr(vcf)
+    main:
+        modify_vcf_pr(vcf)
+    emit:
+        vcf_modified = modify_vcf_pr.out.vcf_modified
 }

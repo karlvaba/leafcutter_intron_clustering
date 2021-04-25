@@ -9,10 +9,8 @@ workflow alignment {
         trimmed_reads
     main:
         if (params.aligner == 'star') {
-            include { star_align } from './modules/alignment/star'
             star_align(trimmed_reads)
         } else { //otherwise align with hisat2
-            include { hisat2_align } from './modules/alignment/hisat2'
             hisat2_align(trimmed_reads)
         }
     emit:

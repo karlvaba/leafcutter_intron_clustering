@@ -113,6 +113,7 @@ process star {
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
+            --outSAMattributes NH HI AS nM NM vA vG vW \\
             --varVCFfile <(zcat ${vcf}) \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\

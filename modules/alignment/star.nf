@@ -123,7 +123,7 @@ process star {
             --runDirPerm All_RWX \\
                 --outFileNamePrefix $prefix $seqCenter
         
-        bamtools filter -tag vW:i:1 -in ${prefix}Aligned.sortedByCoord.out.bam -out ${prefix}Aligned.sortedByCoord.filtered.out.bam
+        samtools view -b -d vW:i:1 ${prefix}Aligned.sortedByCoord.out.bam > ${prefix}Aligned.sortedByCoord.filtered.out.bam
             
         samtools index ${prefix}Aligned.sortedByCoord.filtered.out.bam
         """

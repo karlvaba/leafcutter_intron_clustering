@@ -98,7 +98,7 @@ process star {
     path "*.out", emit: alignment_logs
     path "*SJ.out.tab"
     path "*Log.out", emit: star_log
-    path "${prefix}Aligned.sortedByCoord.out.bam.bai", emit: bam_index
+    path "*.bam.bai", emit: bam_index
 
     script:
     prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
@@ -122,8 +122,10 @@ process star {
             --readFilesCommand zcat \\
             --runDirPerm All_RWX \\
                 --outFileNamePrefix $prefix $seqCenter
+        
+        bamtools filter -tag vW:i:1 -in ${prefix}Aligned.sortedByCoord.out.bam -out ${prefix}Aligned.sortedByCoord.filtered.out.bam
             
-        samtools index ${prefix}Aligned.sortedByCoord.out.bam
+        samtools index ${prefix}Aligned.sortedByCoord.filtered.out.bam
         """
     } else {
         """

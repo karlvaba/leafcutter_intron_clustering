@@ -107,6 +107,8 @@ process star {
     seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
     if (params.wasp) {
         """
+        zcat $vcf > ${vcf.basename}
+
         STAR --genomeDir $star_index \\
             --sjdbGTFfile $gtf \\
             --readFilesIn $reads  \\
@@ -114,7 +116,7 @@ process star {
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
             --outSAMattributes NH HI AS nM NM vA vG vW \\
-            --varVCFfile <(zcat ${vcf}) \\
+            --varVCFfile ${vcf.basename} \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\

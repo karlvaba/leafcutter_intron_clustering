@@ -8,6 +8,6 @@ include { intron_clustering } from './modules/leafcutter/leafcutter'
 
 workflow {
     trim_galore()
-    alignment(trim_galore.out.trimmed_reads)
+    alignment(trim_galore.out.trimmed_reads.collect())
     intron_clustering(alignment.out.bam, alignment.out.bam_index)  
 }

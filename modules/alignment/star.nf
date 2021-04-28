@@ -1,11 +1,11 @@
-/*if( params.gtf ){
+if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
         .set { gtf }
 } else {
     exit 1, "No GTF annotation specified!"
-}*/
+}
 
 if ( params.fasta ){
     Channel.fromPath(params.fasta)
@@ -88,8 +88,12 @@ process star {
 
     input:
     tuple val(samplename), file(reads)
+    file star_index
+    file gtf
+    file vcf
 
     output:
+ 
     tuple file("*Log.final.out"), file ('*.bam'), emit: star_aligned
     path "*.out", emit: alignment_logs
     path "*SJ.out.tab"
@@ -101,11 +105,6 @@ process star {
     def star_mem = task.memory ?: params.star_memory ?: false
     def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
     seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
-
-    star_index = file(params.star_index)
-    gtf = file(params.gtf)
-    vcf = file(params.vcf)
-
     if (params.wasp) {
         """
         zcat $vcf > ${vcf.baseName}
@@ -125,7 +124,7 @@ process star {
                 --outFileNamePrefix $prefix $seqCenter
         
         (samtools view -H ${prefix}Aligned.sortedByCoord.out.bam; samtools view ${prefix}Aligned.sortedByCoord.out.bam | grep -w 'vW:i:1') | samtools view -b - > out.bam
-    
+     
         samtools index ${prefix}Aligned.sortedByCoord.filtered.out.bam
         """
     } else {
@@ -154,7 +153,12 @@ workflow star_align {
         trimmed_reads
     main:
         modify_vcf()
-        star(trimmed_reads)
+
+        s = star_index.first()
+        g = gtf.first()
+        v = modify_vcf.out.vcf_modified.first()
+        
+        star(trimmed_reads, s, g, v)
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
         bam_index = star.out.bam_index

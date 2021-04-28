@@ -88,8 +88,6 @@ process star {
 
     input:
     tuple val(samplename), file(reads)
-    file gtf
-    file vcf
 
     output:
  
@@ -106,16 +104,16 @@ process star {
     seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
     if (params.wasp) {
         """
-        zcat $vcf > ${vcf.baseName}
+        zcat ${params.vcf} > ${params.vcf.baseName}
 
         STAR --genomeDir ${params.star_index} \\
-            --sjdbGTFfile $gtf \\
+            --sjdbGTFfile ${params.gtf} \\
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
             --outSAMattributes NH HI AS nM NM vA vG vW \\
-            --varVCFfile ${vcf.baseName} \\
+            --varVCFfile ${params.vcf.baseName} \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\
@@ -129,7 +127,7 @@ process star {
     } else {
         """
         STAR --genomeDir ${params.star_index} \\
-            --sjdbGTFfile $gtf \\
+            --sjdbGTFfile ${params.gtf} \\
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
@@ -151,8 +149,8 @@ workflow star_align {
     take:
         trimmed_reads
     main:
-        modify_vcf()
-        star(trimmed_reads, gtf.collect(), modify_vcf.out.vcf_modified)
+        //modify_vcf()
+        star(trimmed_reads)
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
         bam_index = star.out.bam_index

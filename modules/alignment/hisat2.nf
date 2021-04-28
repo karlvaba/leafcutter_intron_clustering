@@ -101,9 +101,8 @@ process hisat2_sortOutput {
     file hisat2_bam
 
     output:
-    path "${hisat2_bam.baseName}.sorted.bam", emit: bam
-    path "${hisat2_bam.baseName}.sorted.bam.bai", emit: bam_index
-
+    tuple file("${hisat2_bam.baseName}.sorted.bam"), file("${hisat2_bam.baseName}.sorted.bam.bai"), emit: bam
+ 
     script:
     def avail_mem = task.memory ? "-m ${task.memory.toBytes() / task.cpus}" : ''
     """
@@ -146,5 +145,4 @@ workflow hisat2_align {
         sort_by_name_BAM(hisat2_sortOutput.out.bam)
     emit:
         bam = hisat2_sortOutput.out.bam
-        bam_index = hisat2_sortOutput.out.bam_index
 }

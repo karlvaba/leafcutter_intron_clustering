@@ -15,6 +15,5 @@ workflow alignment {
         }
     emit:
         bam = params.aligner == 'star' ? star_align.out.bam : hisat2_align.out.bam
-        bam_index = params.aligner == 'star' ? star_align.out.bam_index : hisat2_align.out.bam_index
         
 }

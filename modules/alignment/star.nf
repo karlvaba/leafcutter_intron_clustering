@@ -1,11 +1,11 @@
-if( params.gtf ){
+/*if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
         .set { gtf }
 } else {
     exit 1, "No GTF annotation specified!"
-}
+}*/
 
 if ( params.fasta ){
     Channel.fromPath(params.fasta)
@@ -90,7 +90,6 @@ process star {
     tuple val(samplename), file(reads)
 
     output:
- 
     tuple file("*Log.final.out"), file ('*.bam'), emit: star_aligned
     path "*.out", emit: alignment_logs
     path "*SJ.out.tab"
@@ -102,32 +101,37 @@ process star {
     def star_mem = task.memory ?: params.star_memory ?: false
     def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
     seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+
+    star_index = file(params.star_index)
+    gtf = file(params.gtf)
+    vcf = file(params.vcf)
+
     if (params.wasp) {
         """
-        zcat ${params.vcf} > ${params.vcf.baseName}
+        zcat $vcf > ${vcf.baseName}
 
-        STAR --genomeDir ${params.star_index} \\
-            --sjdbGTFfile ${params.gtf} \\
+        STAR --genomeDir $star_index \\
+            --sjdbGTFfile $gtf \\
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
             --waspOutputMode SAMtag \\
             --outSAMattributes NH HI AS nM NM vA vG vW \\
-            --varVCFfile ${params.vcf.baseName} \\
+            --varVCFfile ${vcf.baseName} \\
             --outWigType bedGraph \\
             --outSAMtype BAM SortedByCoordinate $avail_mem \\
             --readFilesCommand zcat \\
             --runDirPerm All_RWX \\
                 --outFileNamePrefix $prefix $seqCenter
         
-        (samtools view -H ${prefix}Aligned.sortedByCoord.out.bam; samtools view ${prefix}Aligned.sortedByCoord.out.bam | grep -w 'vW:i:1') | samtools view -b - > ${prefix}Aligned.sortedByCoord.filtered.out.bam
-   
+        (samtools view -H ${prefix}Aligned.sortedByCoord.out.bam; samtools view ${prefix}Aligned.sortedByCoord.out.bam | grep -w 'vW:i:1') | samtools view -b - > out.bam
+    
         samtools index ${prefix}Aligned.sortedByCoord.filtered.out.bam
         """
     } else {
         """
-        STAR --genomeDir ${params.star_index} \\
-            --sjdbGTFfile ${params.gtf} \\
+        STAR --genomeDir $star_index \\
+            --sjdbGTFfile $gtf \\
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
             --twopassMode Basic \\
@@ -149,7 +153,7 @@ workflow star_align {
     take:
         trimmed_reads
     main:
-        //modify_vcf()
+        modify_vcf()
         star(trimmed_reads)
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }

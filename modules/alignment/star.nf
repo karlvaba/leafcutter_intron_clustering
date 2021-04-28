@@ -159,6 +159,5 @@ workflow star_align {
         
         star(trimmed_reads, s, g, v)
     emit:
-        bam = star.out.star_aligned.filter { logs, bams, bami -> check_log(logs) }.flatMap {  logs, bams, bami -> bams, bami }
-        bam_index = star.out.bam_index
+        bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
 }

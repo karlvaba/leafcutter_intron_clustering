@@ -88,7 +88,6 @@ process star {
 
     input:
     tuple val(samplename), file(reads)
-    file star_index
     file gtf
     file vcf
 
@@ -129,7 +128,7 @@ process star {
         """
     } else {
         """
-        STAR --genomeDir $star_index \\
+        STAR --genomeDir ${params.star_index} \\
             --sjdbGTFfile $gtf \\
             --readFilesIn $reads  \\
             --runThreadN ${task.cpus} \\
@@ -153,7 +152,7 @@ workflow star_align {
         trimmed_reads
     main:
         modify_vcf()
-        star(trimmed_reads, star_index, gtf.collect(), modify_vcf.out.vcf_modified)
+        star(trimmed_reads, gtf.collect(), modify_vcf.out.vcf_modified)
     emit:
         bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
         bam_index = star.out.bam_index

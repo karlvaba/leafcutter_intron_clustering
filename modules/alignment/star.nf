@@ -94,11 +94,10 @@ process star {
 
     output:
  
-    tuple file("*Log.final.out"), file ('*.bam'), emit: star_aligned
+    tuple file("*Log.final.out"), file ('*.bam'), file("*.bam.bai"), emit: star_aligned
     path "*.out", emit: alignment_logs
     path "*SJ.out.tab"
     path "*Log.out", emit: star_log
-    path "*.bam.bai", emit: bam_index
 
     script:
     prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
@@ -160,6 +159,6 @@ workflow star_align {
         
         star(trimmed_reads, s, g, v)
     emit:
-        bam = star.out.star_aligned.filter { logs, bams -> check_log(logs) }.flatMap {  logs, bams -> bams }
-        bam_index = star.out.bam_index
+        bam = star.out.star_aligned.filter { logs, bams, bami -> check_log(logs) }.flatMap {  logs, bams, bami -> bams, bami }
+
 }

@@ -2,8 +2,7 @@ process bam_to_junc {
     container = 'quay.io/karlvaba/leafcutter'
 
     input:
-    file bam
-    file bam_index
+    tuple file(bam), file(bam_index)
 
     output:
     path "${bam.baseName}.junc", emit: junc

@@ -31,8 +31,7 @@ process intron_clustering_pr {
 workflow intron_clustering {
     take:
     bam
-    bam_index
     main:
-    bam_to_junc(bam, bam_index)
+    bam_to_junc(bam)
     intron_clustering_pr(bam_to_junc.out.junc.map{it.toString()}.collectFile(name: 'junction_files.txt', newLine: true))
 }

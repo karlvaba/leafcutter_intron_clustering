@@ -101,8 +101,8 @@ process hisat2_sortOutput {
     file hisat2_bam
 
     output:
-    path "${hisat2_bam.baseName}.sorted.bam"), emit: bam
-    path "${hisat2_bam.baseName}.sorted.bam.bai"), emit: bam_index 
+    path "${hisat2_bam.baseName}.sorted.bam", emit: bam
+    path "${hisat2_bam.baseName}.sorted.bam.bai", emit: bam_index 
  
     script:
     def avail_mem = task.memory ? "-m ${task.memory.toBytes() / task.cpus}" : ''

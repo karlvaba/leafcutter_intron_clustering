@@ -141,7 +141,9 @@ workflow hisat2_align {
         trimmed_reads
     main:
         makeHisatSplicesites(gtf)
-        hisat2Align(trimmed_reads, hs2_indices.collect(), makeHisatSplicesites.out.splicesites)
+        ss = makeHisatSplicesites.out.splicesites.first()
+
+        hisat2Align(trimmed_reads, hs2_indices.collect(), ss)
         hisat2_sortOutput(hisat2Align.out.hisat2_bam)
         sort_by_name_BAM(hisat2_sortOutput.out.bam)
     emit:

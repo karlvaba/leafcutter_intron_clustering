@@ -122,9 +122,9 @@ process star {
             --runDirPerm All_RWX \\
                 --outFileNamePrefix $prefix $seqCenter
         
-        (samtools view -H ${prefix}Aligned.sortedByCoord.out.bam; samtools view ${prefix}Aligned.sortedByCoord.out.bam | grep -w 'vW:i:1') | samtools view -b - > ${prefix}Aligned.sortedByCoord.filtered.out.bam
+        (samtools view -H ${prefix}Aligned.sortedByCoord.out.bam; samtools view ${prefix}Aligned.sortedByCoord.out.bam | grep -w 'vW:i:1') | samtools view -b - > ${prefix}Aligned.sortedByCoord.out.bam
      
-        samtools index ${prefix}Aligned.sortedByCoord.filtered.out.bam
+        samtools index ${prefix}Aligned.sortedByCoord.out.bam
         """
     } else {
         """

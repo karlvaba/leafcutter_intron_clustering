@@ -1,5 +1,6 @@
 process bam_to_junc {
     container = 'quay.io/karlvaba/leafcutter'
+    publishDir "${params.outdir}/leafcutter/juncs", mode: 'copy'
 
     input:
     file bam

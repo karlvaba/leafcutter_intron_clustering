@@ -23,6 +23,7 @@ process intron_clustering_pr {
     file junc_files
     output:
     path "leafcutter_perind*.gz", emit: perind_counts
+    path "*_refined"
     script:
     """
     leafcutter_cluster_regtools.py -j $junc_files -m 50 -o leafcutter -l 500000 --checkchrom TRUE
